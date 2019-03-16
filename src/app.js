@@ -4,9 +4,11 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
-const data = require('./db')
-
 const app = express()
+
+const startRouter = require('./Start/startRouter')
+const searchRouter = require('./Search/searchRouter')
+const notificationsRouter = require('./Notifications/notificationsRouter')
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -20,9 +22,11 @@ app.get('/', (req,res)=>{
   res.send('Hello, world!')
 })
 
-app.get('/data', (req,res)=>{
-  res.send(data.owner)
-})
+app.use('/search', searchRouter)
+
+app.use('/start', startRouter)
+
+app.use('/notifications', notificationsRouter)
 
 app.use(function errorHandler (error, req, res, next){
   let response 
