@@ -8,7 +8,7 @@ exports.seed = function(knex, Promise) {
         {
           title: "React + Node | FullStack App",
           description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-          img: "https://facebook.github.io/create-react-app/img/logo-og.png"      
+          img: "https://facebook.github.io/create-react-app/img/logo-og.png",      
         },
         {
           title: "React Native app",

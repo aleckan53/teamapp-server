@@ -3,7 +3,7 @@ const SearchService = {
     return knex
       .select('*')
       .from('projects as p')
-      .limit(5)
+      .limit(7)
       .offset(offset)
       .then(projects=>knex('projects')
         .count('id')
@@ -14,6 +14,16 @@ const SearchService = {
           }
         })
       )
+  },
+  getProjectsByTerm(knex, searchTerm){
+    return knex('projects')
+      .select('*')
+      .where('title', 'ilike', `%${searchTerm}%`)
+  },
+  getProjectById(knex, id){
+    return knex('projects')
+      .where('id', id)
+      .select('*')
   }
 } 
 
