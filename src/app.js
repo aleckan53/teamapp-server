@@ -6,8 +6,8 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const app = express()
 
-const startRouter = require('./Start/startRouter')
-const searchRouter = require('./Search/searchRouter')
+const UsersRouter = require('./Users/UsersRouter')
+const projectsRouter = require('./Projects/projectsRouter')
 const notificationsRouter = require('./Notifications/notificationsRouter')
 
 const morganOption = (NODE_ENV === 'production')
@@ -22,11 +22,11 @@ app.get('/', (req,res)=>{
   res.send('Hello, world!')
 })
 
-app.use('/search', searchRouter)
+app.use('/api/users', UsersRouter)
 
-app.use('/start', startRouter)
+app.use('/api/projects', projectsRouter)
 
-app.use('/notifications', notificationsRouter)
+app.use('/api/notifications', notificationsRouter)
 
 app.use(function errorHandler (error, req, res, next){
   let response 
