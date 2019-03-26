@@ -14,21 +14,21 @@ VALUES
     'Kan', 
     'olegkan@gmail.com', 
     'https://www.telegraph.co.uk/content/dam/health-fitness/2018/10/10/TELEMMGLPICT000137602298_trans_NvBQzQNjv4Bq6L3Bx11x18zbsv4k04trOLQwDzZ7lnsLeYSCKv0SGGE.jpeg?imwidth=450', 
-    'password1'
+    '$2a$12$IfBv1jfYiM2ZRrQEpteYdue8cwHsf2AuqcLmaC0ZXeX/EvGewEOL2'
   ),
   (
     'John', 
     'Doe', 
     'johndoe@gmail.com', 
     'https://s.hdnux.com/photos/67/37/70/14548493/5/920x920.jpg', 
-    'password2'
+    '$2a$12$r8VstcJ4kRGTf4ET8BOXsOGe74Dmx4mD7k3V9cUkaiRJJfFTx.5Ua'
   ),
   (
     'Jane', 
     'Smith', 
     'janesmith@gmail.com', 
     'https://i.guim.co.uk/img/static/sys-images/Guardian/Pix/pictures/2015/11/11/1447256093904/Natalie-Dormergoin-009.jpg?width=300&quality=85&auto=format&fit=max&s=dd10398f631067df9dbd7332ec82badf', 
-    'password3'
+    '$2a$12$ih..MMyEY28hHpBmMrWCk.w88QxiuTw07SPQ/T4I9Ek3BxEBvsxVG'
   );
 
 INSERT INTO notifications (id, text, user_id) 

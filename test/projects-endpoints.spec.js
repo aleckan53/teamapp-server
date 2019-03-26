@@ -85,7 +85,7 @@ describe('Projects Endpoints', () => {
     })
   })
 
-  describe('GET /api/projects/user/:user_id', ()=> {
+  describe('GET /api/projects/user', ()=> {
     beforeEach('insert users', ()=> helpers.seedUsers(db, users)) 
     beforeEach('insert projects', ()=> helpers.seedProjects(db, projects))
     beforeEach('insert user_projects', ()=> helpers.seedUserProjects(db, user_projects))
@@ -93,7 +93,7 @@ describe('Projects Endpoints', () => {
     context('Given user has projects', ()=> {
       it('responds with 200 and an array of projects', ()=> {
         return supertest(app)
-          .get('/api/projects/user/1')
+          .get('/api/projects/user')
           .expect(200)
           .set('Authorization', helpers.makeAuthHeader(users[0]))
           .expect(res=> {

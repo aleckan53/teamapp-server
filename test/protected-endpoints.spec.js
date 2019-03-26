@@ -24,12 +24,16 @@ describe('Protected endpoints', ()=> {
 
   const protectedEndpoints = [
     {
-      name: 'GET /api/projects/user/:user_id',
-      path: '/api/projects/user/1'
+      name: 'GET /api/projects/user',
+      path: '/api/projects/user'
     },
     {
       name: 'GET /api/users',
       path: '/api/users'
+    },
+    {
+      name: 'GET /api/projects',
+      path: '/api/projects'
     }
   ]
 

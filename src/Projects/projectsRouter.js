@@ -7,6 +7,7 @@ const jsonParser = express.json()
 
 projectsRouter  
   .route('/')
+  .all(requireAuth)
   .get((req,res)=>{
     const limit = 5
     const { term='', page } = req.query
@@ -21,14 +22,16 @@ projectsRouter
   })
 
 projectsRouter
-  .route('/user/:id')
+  .route('/user')
   .all(requireAuth)
-  .get((req,res)=> {
+  .get((req,res, next)=> {
+
     projectsService.getUserProjects(
       req.app.get('db'),
-      req.params.id
+      res.user.id
     )
       .then(data=> res.json(data))
+      .catch(next)
   })
 
 projectsRouter

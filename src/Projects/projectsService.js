@@ -16,6 +16,12 @@ const projectsService = {
       })
     )
   },
+  getUserId(knex, email) {
+    return knex('users')
+      .where({email})
+      .select('id')
+      .first()
+  },
   getProjectsList(knex, term, limit, offset){
     return knex('projects')
       .select('*')

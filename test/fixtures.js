@@ -6,7 +6,7 @@ function makeUsersArray() {
       last_name: 'TU1',
       email: 'test1@test.com',
       avatar: 'link',
-      password: 'password',
+      password: 'password1',
     },
     {
       id: 2,
@@ -14,7 +14,7 @@ function makeUsersArray() {
       last_name: 'TU2',
       email: 'test2@test.com',
       avatar: 'link',
-      password: 'password',
+      password: 'password2',
     },
     {
       id: 3,
@@ -22,7 +22,7 @@ function makeUsersArray() {
       last_name: 'TU3',
       email: 'test3@test.com',
       avatar: 'link',
-      password: 'password',
+      password: 'password3',
     },
   ]
 }

@@ -1,4 +1,5 @@
 const fixtures = require('./fixtures')
+const bcrypt = require('bcrypt')
 
 function makeFixtures () {
   const users = fixtures.makeUsersArray()
@@ -29,7 +30,12 @@ function seedData(db, projects, users, user_projects) {
 }
 
 function seedUsers(db, users) {
-  return db.into('users').insert(users)
+  const preppedUsers = users.map(user=> ({
+    ...user,
+    password: bcrypt.hashSync(user.password, 1)
+  }))
+
+  return db.into('users').insert(preppedUsers)
 }
 
 function seedProjects(db, projects) {
@@ -41,7 +47,7 @@ function seedUserProjects(db, user_projects) {
 }
 
 function makeAuthHeader(user) {
-  const token = Buffer.from(`${user.email}:${user.password}`).toString('base64')
+  const token = `${user.email}:${user.password}`
   return `Bearer ${token}`
 }
 

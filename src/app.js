@@ -6,6 +6,7 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const app = express()
 
+const authRouter = require('./Auth/auth-router')
 const UsersRouter = require('./Users/UsersRouter')
 const projectsRouter = require('./Projects/projectsRouter')
 const notificationsRouter = require('./Notifications/notificationsRouter')
@@ -23,10 +24,10 @@ app.get('/', (req,res)=>{
 })
 
 app.use('/api/users', UsersRouter)
-
 app.use('/api/projects', projectsRouter)
-
 app.use('/api/notifications', notificationsRouter)
+app.use('/api/auth', authRouter)
+
 
 app.use(function errorHandler (error, req, res, next){
   let response 

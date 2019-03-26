@@ -32,14 +32,13 @@ UsersRouter
 UsersRouter
   .route('/')
   .all(requireAuth)
-  .all(checkUserExists)
   .get((req,res)=> {
     res.status(200).json(res.user)
   })
   .patch(jsonParser, (req,res,next)=> {
     UsersService.updateUser(
       req.app.get('db'),
-      res.tokenEmail,
+      res.user.email,
       req.body
     )
       .then(user=> res.status(200).json(user[0]))
@@ -48,29 +47,10 @@ UsersRouter
   .delete((req,res,next)=> {
     UsersService.deleteUser(
       req.app.get('db'),
-      res.tokenEmail
+      res.user.email
     )
       .then(()=> res.status(204).end())
       .catch(next)
   })
-
-
-function checkUserExists(req,res,next) {
-
-  UsersService.getUserByEmail(
-    req.app.get('db'),
-    res.tokenEmail
-  )
-    .then(user=> {
-      if(!user) res.status(404).json({
-        error: `User with id ${req.params.user_id} doesn't exist`
-      })
-      
-      res.user = user
-      next()
-      return null
-    })
-    .catch(next)
-}
 
 module.exports = UsersRouter
