@@ -1,5 +1,6 @@
 const fixtures = require('./fixtures')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 function makeFixtures () {
   const users = fixtures.makeUsersArray()
@@ -46,8 +47,11 @@ function seedUserProjects(db, user_projects) {
   return db.into('user_projects').insert(user_projects)
 }
 
-function makeAuthHeader(user) {
-  const token = `${user.email}:${user.password}`
+function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
+  const token = jwt.sign({user_id: user.id}, secret, {
+    subject: user.email,
+    algorithm: 'HS256'
+  })
   return `Bearer ${token}`
 }
 

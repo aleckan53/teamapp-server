@@ -1,6 +1,16 @@
 const express = require('express')
 const UsersService = require('./UsersService')
-const { requireAuth } = require('../middleware/basic-auth') 
+const { requireAuth } = require('../middleware/jwt-auth') 
+const multer = require('multer')
+const storage = multer.diskStorage({
+  destination: (req,file,cb) => {
+    cb(null, './uploads/')
+  },
+  filename: (req,file,cb)=> {
+    cb(null, file.originalname)
+  }
+})
+const upload = multer({storage})
 
 const UsersRouter = express.Router()
 const jsonParser = express.json()
@@ -8,25 +18,46 @@ const jsonParser = express.json()
 UsersRouter
   .route('/create')
   .post(jsonParser, (req,res,next)=> {
-    const newUser = req.body
+    const userRequest = UsersService.serializeUser(req.body) // serialize data
 
-    UsersService.getAllUsers(req.app.get('db'))
-      .then(users=> {
-        const emailExists = users.some(user=> user.email === newUser.email)
-  
-        if(emailExists) {
-          return res.status(400).json({
-            error: `Email ${newUser.email} is already taken`
-          })
+    for(const field of ['email', 'first_name', 'last_name', 'password']){  // checks missing fields
+      if(!userRequest[field]) {
+        return res.status(400).json({error: `Missing ${field} in request body`})
+      }
+    }
+
+    const passwordError = UsersService.validatePassword(userRequest.password) // validates pasword 
+
+    if(passwordError)
+      return res.status(400).json(passwordError)
+
+    UsersService.validateEmail(req.app.get('db'), userRequest.email)  // vlaidates email
+      .then(emailMatch => {
+        if(emailMatch) {
+          return res.status(400).json({error: `Email ${userRequest.email} is already taken`})
         }
+        const { password } = userRequest
 
-        UsersService.createUser(
-          req.app.get('db'),
-          req.body
-        )
-          .then(user=> res.status(201).json(user))
-          .catch(next)    
+        UsersService.hashPassword(password)  // hashes the password
+          .then(hashedPassword => {
+            const userRdy = {
+              ...userRequest,
+              password: hashedPassword
+            }
+            UsersService.createUser( // inserts in db
+              req.app.get('db'),
+              userRdy
+            )
+              .then(user=> res.status(201).json(user))    
+          })
       })
+      .catch(next)
+  })
+
+UsersRouter 
+  .route('/upload')
+  .post(upload.single('image'), (req,res,next)=> {
+    console.log(req.file)
   })
 
 UsersRouter

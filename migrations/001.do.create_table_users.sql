@@ -3,7 +3,7 @@ CREATE TABLE users (
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  avatar TEXT DEFAULT 'http://laurauinteriordesign.com/wp-content/uploads/2018/03/avatar-placeholder.png',
+  avatar TEXT DEFAULT 'http://laurauinteriordesign.com/wp-content/uploads/2018/03/avatar-placeholder.png' NOT NULL,
   created_at TIMESTAMP DEFAULT now() NOT NULL,
   password TEXT NOT NULL
 );

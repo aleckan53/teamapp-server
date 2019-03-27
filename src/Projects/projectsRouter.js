@@ -1,6 +1,6 @@
 const express = require('express')
 const projectsService = require('./projectsService')
-const { requireAuth } = require('../middleware/basic-auth')
+const { requireAuth } = require('../middleware/jwt-auth')
 
 const projectsRouter = express.Router()
 const jsonParser = express.json()
@@ -9,7 +9,7 @@ projectsRouter
   .route('/')
   .all(requireAuth)
   .get((req,res)=>{
-    const limit = 5
+    const limit = 15
     const { term='', page } = req.query
     const offset = (page-1)*limit
     projectsService.getProjectsList(
@@ -25,7 +25,6 @@ projectsRouter
   .route('/user')
   .all(requireAuth)
   .get((req,res, next)=> {
-
     projectsService.getUserProjects(
       req.app.get('db'),
       res.user.id

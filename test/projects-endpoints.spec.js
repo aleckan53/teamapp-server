@@ -95,7 +95,7 @@ describe('Projects Endpoints', () => {
         return supertest(app)
           .get('/api/projects/user')
           .expect(200)
-          .set('Authorization', helpers.makeAuthHeader(users[0]))
+          .set('Authorization', helpers.makeAuthHeader({...users[0], id: 1}))
           .expect(res=> {
             expect(res.body).to.be.an('array')
             expect(res.body).to.be.not.empty

@@ -47,27 +47,20 @@ describe('Protected endpoints', ()=> {
           })
       })
 
-      it(`responds with 401 'Unauthorized request' when no credentials in token`, ()=> {
-        const userNoCreds = { email: '', password: '' }
+      it(`responds with 401 'Unauthorized request' when invalid JWT secret`, ()=> {
+        const validUser = users[0]
+        const invalidSecret = 'bad-secret'
         return supertest(app)
           .get(`${endpoint.path}`)
-          .set('Authorization', helpers.makeAuthHeader(userNoCreds))
+          .set('Authorization', helpers.makeAuthHeader(validUser, invalidSecret))
           .expect(401, {error: 'Unauthorized request'})
       })
 
-      it(`responds with 401 'Unauthorized request' when invalid user`, ()=> {
-        const userInvalidCreds = {email: 'user-not', password: 'existed'}
+      it(`responds with 401 'Unauthorized request' when invalid sub in payload`, ()=> {
+        const invalidUser = {email: 'user-not', id: 1}
         return supertest(app)
           .get(`${endpoint.path}`)
-          .set('Authorization', helpers.makeAuthHeader(userInvalidCreds))
-          .expect(401, {error: 'Unauthorized request'})
-      })
-
-      it(`responds with 401 'Unauthorized request' when invalid password`, ()=> {
-        const userInvalidPass = {email: users[0].email, password: 'wrong password'}
-        return supertest(app)
-          .get(`${endpoint.path}`)
-          .set('Authorization', helpers.makeAuthHeader(userInvalidPass))
+          .set('Authorization', helpers.makeAuthHeader(invalidUser))
           .expect(401, {error: 'Unauthorized request'})
       })
     })

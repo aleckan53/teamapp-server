@@ -1,7 +1,6 @@
 function makeUsersArray() {
   return [
     { 
-      id: 1,
       first_name: 'test user 1',
       last_name: 'TU1',
       email: 'test1@test.com',
@@ -9,7 +8,6 @@ function makeUsersArray() {
       password: 'password1',
     },
     {
-      id: 2,
       first_name: 'test-user-2',
       last_name: 'TU2',
       email: 'test2@test.com',
@@ -17,7 +15,6 @@ function makeUsersArray() {
       password: 'password2',
     },
     {
-      id: 3,
       first_name: 'test-user-3',
       last_name: 'TU3',
       email: 'test3@test.com',
@@ -74,17 +71,17 @@ function makeProjectsArray() {
 function makeUserProjectsArray(users, projects) {
   return [
     {
-      user_id: users[0].id,
+      user_id: 1,
       role: "1",
       project_id: projects[0].id
     },
     {
-      user_id: users[0].id,
+      user_id: 1,
       role: "1",
       project_id: projects[1].id
     },
     {
-      user_id: users[1].id,
+      user_id: 2,
       role: "2",
       project_id: projects[0].id
     },

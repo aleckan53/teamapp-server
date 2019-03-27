@@ -1,3 +1,6 @@
+const bcrypt = require('bcrypt')
+const xss = require('xss')
+
 const UsersService = {
   getAllUsers(knex) {
     return knex('users')
@@ -25,6 +28,46 @@ const UsersService = {
     return knex('users')
       .where({email})
       .delete()
+  },
+  validatePassword(password) {
+    if(password.length < 8) {
+      return {error: 'Password must be longer than 8 characters'}
+    }
+    if(password.length > 72) {
+      return {error: 'Password must be less than 72 characters'}
+    }
+    if(password.indexOf(' ')>0) {
+      return {error: `Password can't have spaces`}
+    }
+    if(!/([0-9])/.test(password)){
+      return {error: 'Password must include at least 1 number'}
+    }
+  },
+  validateEmail(knex, email) {
+    return knex('users')
+      .where({email})
+      .first()
+      .then(email=> !!email)
+  },
+  hashPassword(password) {
+    return bcrypt.hash(password, 12)
+  },
+  serializeUser(user) {
+    return {
+      email: xss(user.email),
+      first_name: xss(user.first_name),
+      last_name: xss(user.last_name),
+      avatar: xss(user.avatar),
+      password: xss(user.password)
+    }
+  },
+  validateAvatar(str) {
+    try {
+      new URL(str)
+      return true
+    } catch {
+      return false
+    }
   }
 }
 

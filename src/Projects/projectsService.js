@@ -4,7 +4,7 @@ const projectsService = {
       .where('up.user_id', user_id)
       .join('projects as p', 'p.id', '=', 'up.project_id')
       .select('*')
-      .orderBy('p.id') // add sort by rating
+      .orderBy('p.id')
       .then(data=> data.map(p=> {
         return {
           id: p.id,
