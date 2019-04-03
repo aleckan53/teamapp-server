@@ -11,7 +11,8 @@ const projectsService = {
           title: p.title,
           img: p.img,
           description: p.description,
-          role: p.role
+          role: p.role,
+          leader_id: p.leader_id
         }  
       })
     )
@@ -45,6 +46,17 @@ const projectsService = {
       .where('id', id)
       .select('*')
       .first()
+      .then(project=> {
+        if(!!project) {
+          return knex('user_projects')
+            .where({project_id: project.id})
+            .select('*')
+            .then(list=> ({
+              ...project,
+              contributors: list
+            }))
+        }
+      })
   },
   addProject(knex, project, userId){
     return knex
@@ -55,8 +67,9 @@ const projectsService = {
         .into('user_projects')
         .insert({
           user_id: userId,
-          role: "1",
-          project_id: proj[0].id
+          role: "leader",
+          project_id: proj[0].id,
+          title: 'Project lead'
         })
         .returning('*')
         .then(u_p=> {
@@ -71,7 +84,7 @@ const projectsService = {
   updateProject(knex, project, id){
     return knex('projects')
       .where({id})
-      .update(project, ['id', 'title', 'description', 'img'])
+      .update(project, ['id', 'title', 'description', 'img', 'leader_id'])
   },
   deleteProject(knex, id){
     return knex('user_projects')
@@ -81,7 +94,13 @@ const projectsService = {
         .where({id})
         .delete()
       )
-  }
+  },
+  getContributorsList(knex, project_id) {
+    return knex('user_projects as up')
+      .join('users as u', 'u.id', '=', 'up.user_id')
+      .where('up.project_id', project_id)
+      .select('user_id', 'role', 'title', 'first_name', 'last_name', 'avatar')
+  },
 } 
 
 module.exports = projectsService

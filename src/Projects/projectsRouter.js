@@ -37,18 +37,18 @@ projectsRouter
   .route('/add')
   .all(requireAuth)
   .post(jsonParser, (req,res,next)=>{
-    const { title, description, img, user_id } = req.body
-    const newProject = { title, description, img }
+    const { title, description, img, leader_id } = req.body
+    const newProject = { title, description, img, leader_id: res.user.id }
     for (const [key, value] of Object.entries(newProject))
     if (value == null)
       return res.status(400).json({
         error: `Missing '${key}' in request body`
       })
-
+    
     projectsService.addProject(
       req.app.get('db'),
       newProject,
-      user_id
+      res.user.id
     )
       .then(data=> res.status(201).json(data))
       .catch(next)
@@ -78,6 +78,23 @@ projectsRouter
       req.params.project_id
     )
       .then(()=> res.status(204).end())
+      .catch(next)
+  })
+
+projectsRouter
+  .route('/:project_id/contributors')
+  .all(requireAuth)
+  .all(checkProjectExists)
+  .get((req,res, next)=> {
+    projectsService.getContributorsList(req.app.get('db'), req.params.project_id)
+      .then(list=> {
+        if(!list) {
+          return res.status(404).json({error: 'Something went wrong'})
+        }
+
+        return res.status(200).json(list)
+
+      })
       .catch(next)
   })
 

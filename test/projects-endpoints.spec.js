@@ -52,36 +52,33 @@ describe('Projects Endpoints', () => {
   })
 
   describe('GET /api/projects/:project_id', () => {
-    beforeEach('insert users in the db', () => helpers.seedUsers(db, users))
+    beforeEach('insert users in the db', () => {
+      return helpers.seedUsers(db, users)
+        .then(()=>helpers.seedProjects(db, projects))
+    })
 
-    context('Given no projects', ()=> {
-      it('responds with 404', ()=> {
-        return supertest(app)
-        .get('/api/projects/999')
-        .set('Authorization', helpers.makeAuthHeader(users[0]))
-        .expect(404, {
-          error: `Project with id 999 doesn't exist`
-        })
+    it('responds with 404 when project doesn\'t exist', ()=> {
+      return supertest(app)
+      .get('/api/projects/999')
+      .set('Authorization', helpers.makeAuthHeader(users[0]))
+      .expect(404, {
+        error: `Project with id 999 doesn't exist`
       })
     })
 
-    context('Given there are projects in the db', ()=> {
-      before('insert projects in the db', () => helpers.seedProjects(db, projects))
-
-      it('responds with 200 and project if valid project_id', ()=> {
-        const expected = projects[0]
-        return supertest(app)
-          .get(`/api/projects/1`)
-          .set('Authorization', helpers.makeAuthHeader(users[0]))
-          .expect(200)
-          .expect(res => {
-            expect(res.body).to.be.an('object')
-            expect(res.body.title).to.eql(expected.title)
-            expect(res.body.description).to.eql(expected.description)
-            expect(res.body.img).to.eql(expected.img)
-            expect(new Date(res.body.created_at)).to.be.an.instanceof(Date)
-          })
-      })
+    it('responds with 200 and project when valid project_id', ()=> {
+      const expected = projects[0]
+      return supertest(app)
+        .get(`/api/projects/1`)
+        .set('Authorization', helpers.makeAuthHeader(users[0]))
+        .expect(200)
+        .expect(res => {
+          expect(res.body).to.be.an('object')
+          expect(res.body.title).to.eql(expected.title)
+          expect(res.body.description).to.eql(expected.description)
+          expect(res.body.img).to.eql(expected.img)
+          expect(new Date(res.body.created_at)).to.be.an.instanceof(Date)
+        })
     })
   })
 
@@ -122,7 +119,6 @@ describe('Projects Endpoints', () => {
         title: 'New test project',
         img: 'img_link',
         description: 'description',
-        user_id: 2
       }
       return supertest(app)
         .post('/api/projects/add')

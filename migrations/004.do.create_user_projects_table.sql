@@ -7,7 +7,7 @@ CREATE TABLE user_projects (
 DROP TYPE IF EXISTS role_type;
 
 CREATE TYPE role_type AS ENUM (
-  '1', '2' 
+  'leader', 'contributor' 
 );
 
 ALTER TABLE user_projects

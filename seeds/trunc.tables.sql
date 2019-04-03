@@ -2,5 +2,6 @@ TRUNCATE
   user_projects,
   projects,
   notifications,
-  users
+  users,
+  requests
   RESTART IDENTITY CASCADE;

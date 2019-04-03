@@ -2,6 +2,19 @@ const bcrypt = require('bcrypt')
 const xss = require('xss')
 
 const UsersService = {
+  getUsersRequests(knex, id){ 
+    return knex('requests')
+      .where('sender_id', id)
+      .select('*')
+      .then(outgoing=> knex('requests')
+        .where('recipient_id', id)
+        .select('*')
+        .then(incoming=> ({
+          outgoing,
+          incoming
+        }))
+      )
+  },
   getAllUsers(knex) {
     return knex('users')
       .select('*')

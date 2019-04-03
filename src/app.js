@@ -10,6 +10,7 @@ const authRouter = require('./Auth/auth-router')
 const UsersRouter = require('./Users/UsersRouter')
 const projectsRouter = require('./Projects/projectsRouter')
 const notificationsRouter = require('./Notifications/notificationsRouter')
+const requestsRouter = require('./Requests/requsetsRouter')
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -27,7 +28,7 @@ app.use('/api/users', UsersRouter)
 app.use('/api/projects', projectsRouter)
 app.use('/api/notifications', notificationsRouter)
 app.use('/api/auth', authRouter)
-
+app.use('/api/requests', requestsRouter)
 
 app.use(function errorHandler (error, req, res, next){
   let response 

@@ -63,8 +63,18 @@ UsersRouter
 UsersRouter
   .route('/')
   .all(requireAuth)
-  .get((req,res)=> {
-    res.status(200).json(res.user)
+  .get((req,res, next)=> {
+    UsersService.getUsersRequests(req.app.get('db'), res.user.id)
+      .then(data => {
+        if(!data) {
+          return res.status(404).json({error: 'Something went wrong'})
+        }
+        return res.status(200).json({
+          ...res.user,
+          ...data
+        })
+      })
+      .catch(next)
   })
   .patch(jsonParser, (req,res,next)=> {
     UsersService.updateUser(
