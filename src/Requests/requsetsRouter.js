@@ -44,6 +44,7 @@ requestsRouter
   .all(requireAuth)
   .patch(jsonParser, (req,res,next)=> {
     const { request_id } = req.body
+    console.log(req.body)
     // changes request status => if 'Accepted' add the user to user_projects table
     RequestService.updateRequest(req.app.get('db'), req.body, request_id)
       .then(data=> {
