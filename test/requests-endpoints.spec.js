@@ -3,7 +3,7 @@ const knex = require('knex')
 const helpers = require('./test-helpers')
 
 
-describe('Requests endpoints', ()=> {
+describe.only('Requests endpoints', ()=> {
   let db
 
   const {
@@ -22,7 +22,7 @@ describe('Requests endpoints', ()=> {
   before('cleanup', () => helpers.cleanTables(db))
   afterEach('cleanup', () => helpers.cleanTables(db))
 
-  describe('POST /api/requests/project/:project_id', ()=> {
+  describe('POST /api/requests/projects/:project_id', ()=> {
     beforeEach('insert users in the db', () => {
       return helpers.seedUsers(db, users)
         .then(()=>helpers.seedProjects(db, projects))
@@ -52,17 +52,20 @@ describe('Requests endpoints', ()=> {
           })
         )
     })
+  })
+
+  describe.skip('PATCH /api/requests/:request_id', ()=> {
 
     const statusChanges = ['accepted', 'declined']
 
     statusChanges.forEach(status=> 
-      it('responds with 200 and updates the request', ()=> {
+      it.skip('responds with 200 and updates the request', ()=> {
         return supertest(app)
-          .post('/api/requests/projects/1')
+          .post('/api/requests/1')
           .set('Authorization', helpers.makeAuthHeader(users[1]))
           .send(testRequest)
           .then(res=> supertest(app)
-            .patch('/api/requests/projects/1')
+            .patch('/api/requests/1')
             .set('Authorization', helpers.makeAuthHeader(users[1]))
             .send({
               ...res.body,
@@ -77,7 +80,6 @@ describe('Requests endpoints', ()=> {
           )
       })
     )
-
   })
 
 })

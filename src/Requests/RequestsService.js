@@ -34,6 +34,11 @@ const RequestsService = {
         }
       })
   },
+  deleteRequest(knex, id) {
+    return knex('requests')
+      .where({id})
+      .delete()
+  }
 }
 
 module.exports = RequestsService

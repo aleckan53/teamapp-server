@@ -1,69 +1,9 @@
 const express = require('express')
+const jsonParser = express.json()
+const requestsRouter = express.Router()
 const { requireAuth } = require('../middleware/jwt-auth')
 const RequestService = require('./RequestsService')
-const requestsRouter = express.Router()
-const jsonParser = express.json()
 const UsersService = require('../Users/UsersService')
-
-requestsRouter
-  .route('/:request_id')
-  .all(requireAuth)
-  .patch(jsonParser, (req,res,next)=> {
-    const { status, request_id } = req.body
-    // changes request status => if 'Accepted' add the user to user_projects table
-    RequestService.updateRequest(req.app.get('db'), req.body, request_id)
-      .then(data=> {
-        console.log(data)
-        if(!data) {
-          return res.status(404).json({error: 'Not Found'})
-        } 
-      })
-  })
-
-
-requestsRouter
-  .route('/users')
-  .all(requireAuth)
-  .get((req,res,next)=> {
-    // sets up an open connection
-    res.status(200).set({
-      'connection': 'keep-alive',
-      'cache-control': 'no-cache',
-      'content-type': 'text/event-stream'
-    })
-
-    const prevData = {
-      outgoing: [],
-      incoming: [],
-    }
-
-    UsersService.getUsersRequests(req.app.get('db'), res.user.id)
-      .then(data=> (
-        prevData.outgoing = data.outgoing,
-        prevData.incoming = data.incoming
-      ))
-      .then(()=> res.write(`data: ${JSON.stringify(prevData)}\n\n`))
-
-    let check = setInterval(()=> {
-      UsersService.getUsersRequests(req.app.get('db'), res.user.id)
-        .then(nextData=> {
-          if((nextData.incoming.length > prevData.incoming.length) === true) {
-            prevData.incoming = nextData.incoming,
-            prevData.outgoing = nextData.outgoing
-            return res.write(`data: ${JSON.stringify(prevData)}\n\n`)
-          }
-          console.log('no change')
-        })
-    }, 4000)
-
-
-    req.on("close", function () {
-      console.log('Bye!')
-      clearInterval(check)
-      res.end()
-    });
-  })
-
 
 requestsRouter
   .route('/projects/:project_id')
@@ -74,7 +14,6 @@ requestsRouter
         if(!request) {
           return res.status(404).json({error: 'Doesn\'t exist'})
         }
-
         return res.status(200).json(request)
       })
       .catch(next)
@@ -98,6 +37,63 @@ requestsRouter
     RequestService.createRequest(req.app.get('db'), res.newRequest)
       .then(request=> res.status(201).json(request))
       .catch(next)
+  })
+
+requestsRouter
+  .route('/:request_id')
+  .all(requireAuth)
+  .patch(jsonParser, (req,res,next)=> {
+    const { request_id } = req.body
+    // changes request status => if 'Accepted' add the user to user_projects table
+    RequestService.updateRequest(req.app.get('db'), req.body, request_id)
+      .then(data=> {
+        if(!data) {
+          return res.status(404).json({error: 'Not Found'})
+        } 
+        return RequestService.deleteRequest(req.app.get('db'), request_id)
+      })
+  })
+
+requestsRouter
+  .route('/users')
+  .all(requireAuth)
+  .get((req,res,next)=> {
+    // sets up an open connection
+    res.status(200).set({
+      'connection': 'keep-alive',
+      'cache-control': 'no-cache',
+      'content-type': 'text/event-stream'
+    })
+
+    const prevData = {
+      outgoing: [],
+      incoming: [],
+    }
+
+// TODO #1: get rid of setInterval (use Redis) 
+/**/    UsersService.getUsersRequests(req.app.get('db'), res.user.id)
+/**/      .then(data=> (
+/**/        prevData.outgoing = data.outgoing,
+/**/        prevData.incoming = data.incoming
+/**/      ))
+/**/      .then(()=> res.write(`data: ${JSON.stringify(prevData)}\n\n`))
+/**/
+/**/    let check = setInterval(()=> {
+/**/      UsersService.getUsersRequests(req.app.get('db'), res.user.id)
+/**/        .then(nextData=> {
+/**/          if(nextData.incoming.length !== prevData.incoming.length || nextData.outgoing.length !== prevData.outgoing.length) {
+/**/            prevData.incoming = nextData.incoming,
+/**/            prevData.outgoing = nextData.outgoing
+/**/            return res.write(`data: ${JSON.stringify(prevData)}\n\n`)
+/**/          }
+/**/        })
+/**/    }, 2000)
+/**/ 
+
+    req.on("close", function () {
+      clearInterval(check)
+      res.end()
+    });
   })
 
   module.exports = requestsRouter
