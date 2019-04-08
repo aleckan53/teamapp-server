@@ -1,8 +1,7 @@
 const express = require('express')
-const AuthService = require('./Auth-service')
-
-const authRouter = express.Router()
 const jsonParser = express.json()
+const authRouter = express.Router()
+const AuthService = require('./authService')
 
 authRouter
   .post('/login', jsonParser, (req, res, next) => {
@@ -41,7 +40,6 @@ authRouter
           })
           .catch(next)
       })
-
   })
 
 module.exports = authRouter

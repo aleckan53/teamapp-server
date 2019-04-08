@@ -1,7 +1,7 @@
 const app = require('../src/app')
 const jwt = require('jsonwebtoken')
 const knex = require('knex')
-const helpers = require('./test-helpers')
+const helpers = require('./helperes/test-helpers')
 
 describe('Auth Endpoints', ()=> {
   let db

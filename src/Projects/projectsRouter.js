@@ -1,9 +1,8 @@
 const express = require('express')
-const projectsService = require('./projectsService')
-const { requireAuth } = require('../middleware/jwt-auth')
-
-const projectsRouter = express.Router()
 const jsonParser = express.json()
+const { requireAuth } = require('../middleware/jwt-auth')
+const projectsRouter = express.Router()
+const ProjectsService = require('./projectsService')
 
 projectsRouter  
   .route('/')
@@ -12,7 +11,7 @@ projectsRouter
     const limit = 15
     const { term='', page } = req.query
     const offset = (page-1)*limit
-    projectsService.getProjectsList(
+    ProjectsService.getProjectsList(
       req.app.get('db'),
       term,
       limit,
@@ -25,7 +24,7 @@ projectsRouter
   .route('/user')
   .all(requireAuth)
   .get((req,res, next)=> {
-    projectsService.getUserProjects(
+    ProjectsService.getUserProjects(
       req.app.get('db'),
       res.user.id
     )
@@ -37,15 +36,15 @@ projectsRouter
   .route('/add')
   .all(requireAuth)
   .post(jsonParser, (req,res,next)=>{
-    const { title, description, img, leader_id } = req.body
+    const { title, description, img } = req.body
     const newProject = { title, description, img, leader_id: res.user.id }
     for (const [key, value] of Object.entries(newProject))
-    if (value == null)
-      return res.status(400).json({
-        error: `Missing '${key}' in request body`
-      })
+      if (value == null)
+        return res.status(400).json({
+          error: `Missing '${key}' in request body`
+        })
     
-    projectsService.addProject(
+    ProjectsService.addProject(
       req.app.get('db'),
       newProject,
       res.user.id
@@ -64,7 +63,7 @@ projectsRouter
   .patch(jsonParser, (req,res,next)=>{
     const { title, description, img } = req.body
     const updatedProject = { title, description, img }
-    projectsService.updateProject(
+    ProjectsService.updateProject(
       req.app.get('db'),
       updatedProject,
       req.params.project_id
@@ -73,7 +72,7 @@ projectsRouter
       .catch(next)
   })
   .delete((req,res,next)=>{
-    projectsService.deleteProject(
+    ProjectsService.deleteProject(
       req.app.get('db'),
       req.params.project_id
     )
@@ -86,7 +85,7 @@ projectsRouter
   .all(requireAuth)
   .all(checkProjectExists)
   .get((req,res, next)=> {
-    projectsService.getContributorsList(req.app.get('db'), req.params.project_id)
+    ProjectsService.getContributorsList(req.app.get('db'), req.params.project_id)
       .then(list=> {
         if(!list) {
           return res.status(404).json({error: 'Something went wrong'})
@@ -100,7 +99,7 @@ projectsRouter
 
 
 function checkProjectExists(req,res,next) {
-  projectsService.getProjectById(
+  ProjectsService.getProjectById(
     req.app.get('db'),
     req.params.project_id
   )
@@ -112,7 +111,7 @@ function checkProjectExists(req,res,next) {
     }  
     res.project = project
     next()
-    return null  
+    return null
    })
    .catch(next)
 }

@@ -6,11 +6,12 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const app = express()
 
-const authRouter = require('./Auth/auth-router')
-const UsersRouter = require('./Users/UsersRouter')
-const projectsRouter = require('./Projects/projectsRouter')
-const notificationsRouter = require('./Notifications/notificationsRouter')
-const requestsRouter = require('./Requests/requsetsRouter')
+const authRouter = require('./auth/authRouter')
+const usersRouter = require('./users/usersRouter')
+const projectsRouter = require('./projects/projectsRouter')
+
+const requestsSocket = require('./socket/requestsSocket')
+const requestsSse = require('./Requests/requestsSse')
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -19,17 +20,14 @@ const morganOption = (NODE_ENV === 'production')
 app.use(morgan(morganOption))
 app.use(cors())
 app.use(helmet())
-
-app.get('/', (req,res)=>{
-  res.send('Hello, world!')
-})
-
-app.use('/api/users', UsersRouter)
+app.use('/api/users', usersRouter)
 app.use('/api/projects', projectsRouter)
-app.use('/api/notifications', notificationsRouter)
 app.use('/api/auth', authRouter)
-app.use('/api/requests', requestsRouter)
+app.use('/api/requests', requestsSocket)
+app.use('/api/sse', requestsSse)
 
+
+/* handles internal errors */
 app.use(function errorHandler (error, req, res, next){
   let response 
   if (NODE_ENV === 'production'){

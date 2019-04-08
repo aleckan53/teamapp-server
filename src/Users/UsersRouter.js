@@ -1,5 +1,5 @@
 const express = require('express')
-const UsersService = require('./UsersService')
+const UsersService = require('./usersService')
 const { requireAuth } = require('../middleware/jwt-auth') 
 const multer = require('multer')
 const storage = multer.diskStorage({
@@ -12,10 +12,10 @@ const storage = multer.diskStorage({
 })
 const upload = multer({storage})
 
-const UsersRouter = express.Router()
+const usersRouter = express.Router()
 const jsonParser = express.json()
 
-UsersRouter
+usersRouter
   .route('/create')
   .post(jsonParser, (req,res,next)=> {
     const userRequest = UsersService.serializeUser(req.body) // serialize data
@@ -54,13 +54,13 @@ UsersRouter
       .catch(next)
   })
 
-UsersRouter 
+usersRouter 
   .route('/upload')
   .post(upload.single('image'), (req,res,next)=> {
     console.log(req.file)
   })
 
-UsersRouter
+usersRouter
   .route('/')
   .all(requireAuth)
   .get((req,res, next)=> {
@@ -94,4 +94,4 @@ UsersRouter
       .catch(next)
   })
 
-module.exports = UsersRouter
+module.exports = usersRouter

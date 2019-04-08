@@ -1,4 +1,4 @@
-const AuthService = require('../Auth/Auth-service')
+const AuthService = require('../Auth/authService')
 
 function requireAuth(req, res, next) {
   const authToken = req.get('Authorization') || ''
@@ -18,6 +18,7 @@ function requireAuth(req, res, next) {
         if(!user) {
           return res.status(401).json({error: 'Unauthorized request'})
         }
+        delete user.password
         res.user = user
         next()
         return null

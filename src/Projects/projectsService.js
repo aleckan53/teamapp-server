@@ -1,4 +1,4 @@
-const projectsService = {
+const ProjectsService = {
   getUserProjects(knex, user_id) {
     return knex('user_projects as up')
       .where('up.user_id', user_id)
@@ -103,4 +103,4 @@ const projectsService = {
   },
 } 
 
-module.exports = projectsService
+module.exports = ProjectsService
