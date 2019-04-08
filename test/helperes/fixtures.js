@@ -79,14 +79,14 @@ function makeUserProjectsArray(users, projects) {
       project_id: projects[0].id
     },
     {
-      user_id: 1,
-      role: "leader",
-      project_id: projects[1].id
-    },
-    {
       user_id: 2,
       role: "contributor",
       project_id: projects[0].id
+    },
+    {
+      user_id: 2,
+      role: "leader",
+      project_id: projects[1].id
     },
   ]
 }

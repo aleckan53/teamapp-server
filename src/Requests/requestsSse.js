@@ -51,49 +51,21 @@ requestsSse
     return null
   })
   .post((req,res,next) => {
-    RequestService.createRequest(req.app.get('db'), res.newRequest)
-      .then(request => {
-        sse.emit('newRequest')
-        res.send(request)
+    RequestService.getRequestsByProject(req.app.get('db'), res.newRequest.project_id)
+      .then(list => {
+        if(list.some(r => r.sender_id === res.user.id)) {
+          return res.status(400).json({error: 'Request already exists'})
+        } else {
+          RequestService.createRequest(req.app.get('db'), res.newRequest)
+            .then(request => {
+              sse.emit('newRequest')
+              res.status(201).json(request)
+            })    
+        }
       })
       .catch(next)
   })
   .patch()
   .delete()
-
-
-requestsSse.post('/message', jsonParser, (req, res, next) => {
-  const message = req.body.message;
-  console.log(message)
-	// ...
-	// Some code here to handle the message, 
-	// by saving it in a database for instance
-	// ...
-	sse.emit('newRequest', {
-		title: 'New message!',
-		message,
-		timestamp: new Date()
-  });
-  res.end()
-})
-
-requestsSse.get('/eventstream', (req, res, next) => {
-	res.set({
-		'Content-Type': 'text/event-stream',
-		'Cache-Control': 'no-cache',
-		'Connection': 'keep-alive'
-  });
-  console.log('connected')
-  res.setTimeout(0)
-  
-	sse.on('message', data => {
-		res.write(`event: message\n`);
-		res.write(`data: ${JSON.stringify(data)}\n\n`);
-  });
-  
-  sse.on('close', () => {
-    res.end()
-  })
-});
 
 module.exports = requestsSse
