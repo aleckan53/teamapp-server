@@ -1,7 +1,7 @@
 const express = require('express');
 const requestsSse = express.Router()
 const { requireAuth } = require('../middleware/jwt-auth')
-const RequestService = require('./RequestsService')
+const RequestsService = require('./RequestsService')
 const jsonParser = express.json()
 
 requestsSse
@@ -15,13 +15,13 @@ requestsSse
     })
     res.setTimeout(0)
 
-    RequestService.getUsersRequests(req.app.get('db'), res.user.id)
+    RequestsService.getUsersRequests(req.app.get('db'), res.user.id)
       .then(requests => {
         res.write(`data: ${JSON.stringify(requests)}\n\n`)
       })
 
     sse.on('newRequest', () => {
-      RequestService.getUsersRequests(req.app.get('db'), res.user.id)
+      RequestsService.getUsersRequests(req.app.get('db'), res.user.id)
         .then(requests => {
           res.write(`data: ${JSON.stringify(requests)}\n\n`)
         })
@@ -50,13 +50,13 @@ requestsSse
     return null
   })
   .post((req,res,next) => {
-    RequestService.getRequestsByProject(req.app.get('db'), res.newRequest.project_id)
+    RequestsService.getRequestsByProject(req.app.get('db'), res.newRequest.project_id)
       .then(list => {
         if(list.some(r => r.sender_id === res.user.id)) {
           return res.status(400).json({error: 'Request already exists'})
         } 
 
-        return RequestService.createRequest(req.app.get('db'), res.newRequest)
+        return RequestsService.createRequest(req.app.get('db'), res.newRequest)
           .then(() => {
             sse.emit('newRequest')
             return res.status(201).json({message: 'Success!'}).end()
@@ -66,10 +66,22 @@ requestsSse
   })
   .patch((req,res,next) => {
     const { status, id } = res.newRequest
-    RequestService.updateRequest(req.app.get('db'), status, id)
+    RequestsService.updateRequest(req.app.get('db'), status, id)
       .then(() => {
         sse.emit('newRequest')
         return res.status(200).json({message: 'Success!'}).end()
+      })
+      .catch(next)
+  })
+
+requestsSse
+  .route('/requests/:request_id')
+  .all(requireAuth)
+  .delete((req,res,next) => {
+    RequestsService.deleteRequest(req.app.get('db'), req.params.request_id)
+      .then(() => {
+        sse.emit('newRequest')
+        return res.status(204).json({message: 'Success!'}).end()
       })
       .catch(next)
   })
