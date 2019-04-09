@@ -91,9 +91,25 @@ function makeUserProjectsArray(users, projects) {
   ]
 }
 
+function makeRequestsArray () {
+  return [
+    {
+      project_id: 1,
+      sender_id: 2,
+      recipient_id: 1,
+    },
+    {
+      project_id: 2,
+      sender_id: 1,
+      recipient_id: 2,
+    }
+  ]
+}
+
 module.exports = {
   makeUsersArray,
   makeProjectsArray,
   makeNotificationsArray,
   makeUserProjectsArray,
+  makeRequestsArray,
 }

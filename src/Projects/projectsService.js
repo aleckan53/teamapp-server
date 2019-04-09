@@ -5,17 +5,13 @@ const ProjectsService = {
       .join('projects as p', 'p.id', '=', 'up.project_id')
       .select('*')
       .orderBy('p.id')
-      .then(data=> data.map(p=> {
-        return {
-          id: p.id,
-          title: p.title,
-          img: p.img,
-          description: p.description,
-          role: p.role,
-          leader_id: p.leader_id
-        }  
-      })
-    )
+      .then(list => list.map(project => {
+          if (project.leader_id === user_id) {
+            project.userCanEdit = true
+          }
+          return project
+        })
+      )
   },
   getUserId(knex, email) {
     return knex('users')
@@ -41,7 +37,7 @@ const ProjectsService = {
         })
       )
   },
-  getProjectById(knex, id){
+  getProjectById(knex, id, user_id){
     return knex('projects')
       .where('id', id)
       .select('*')
@@ -87,13 +83,16 @@ const ProjectsService = {
       .update(project, ['id', 'title', 'description', 'img', 'leader_id'])
   },
   deleteProject(knex, id){
-    return knex('user_projects')
+    return knex('requests')
+      .where('project_id', id)
+      .delete()
+      .then(() => knex('user_projects')
       .where('project_id', id)
       .delete()
       .then(()=> knex('projects')
         .where({id})
         .delete()
-      )
+      ))
   },
   getContributorsList(knex, project_id) {
     return knex('user_projects as up')

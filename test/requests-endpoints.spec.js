@@ -2,11 +2,11 @@ const app = require('../src/app')
 const knex = require('knex')
 const helpers = require('./helperes/test-helpers')
 
-describe('Requests endpoints', () => {
+describe.only('Requests endpoints', () => {
   let db
 
   const {
-    users, projects, notifications, user_projects
+    users, projects, requests
   } = helpers.makeFixtures()
 
   before('make knex instance', () => {
@@ -21,7 +21,7 @@ describe('Requests endpoints', () => {
   before('cleanup', () => helpers.cleanTables(db))
   afterEach('cleanup', () => helpers.cleanTables(db))
 
-  describe.only('POST /api/sse/requests', () => {
+  describe('POST /api/sse/requests', () => {
     beforeEach('insert users and projects in the db', () => {
       return helpers.seedUsers(db, users)
         .then(()=>helpers.seedProjects(db, projects))
@@ -56,5 +56,35 @@ describe('Requests endpoints', () => {
 
   })
 
+  describe('PATCH /api/sse/requests', () => {
+    beforeEach('insert users and projects in the db', () => {
+      return helpers.seedUsers(db, users)
+        .then(()=>helpers.seedProjects(db, projects)
+        .then(()=>helpers.seedRequests(db, requests)))
+    })
 
+    it('responds with 200 and request status "Accepted"', () => {
+      return supertest(app)
+        .patch('/api/sse/requests')
+        .set('Authorization', helpers.makeAuthHeader(users[0]))
+        .send({id: 1, status: 'Accepted'})
+        .expect(200)
+    })
+  })
+
+  describe('DELETE /api/sse/requests', () => {
+    beforeEach('insert users and projects in the db', () => {
+      return helpers.seedUsers(db, users)
+        .then(()=>helpers.seedProjects(db, projects)
+        .then(()=>helpers.seedRequests(db, requests)))
+    })
+
+    it('repsonds with 204 and removes specified request', () => {
+      return supertest(app)
+        .delete('/api/sse/requests')
+        .set('Authorization', helpers.makeAuthHeader(users[0]))
+        .send({id: 1})
+        .expect(204) // check db if request is gone
+    })  
+  })
 })

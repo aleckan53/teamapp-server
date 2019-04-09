@@ -5,6 +5,9 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const app = express()
+const sse = express()
+
+global.sse = sse
 
 const authRouter = require('./auth/authRouter')
 const usersRouter = require('./users/usersRouter')

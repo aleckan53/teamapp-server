@@ -1,5 +1,4 @@
 const express = require('express');
-const sse = express()
 const requestsSse = express.Router()
 const { requireAuth } = require('../middleware/jwt-auth')
 const RequestService = require('./RequestsService')
@@ -55,17 +54,25 @@ requestsSse
       .then(list => {
         if(list.some(r => r.sender_id === res.user.id)) {
           return res.status(400).json({error: 'Request already exists'})
-        } else {
-          RequestService.createRequest(req.app.get('db'), res.newRequest)
-            .then(request => {
-              sse.emit('newRequest')
-              res.status(201).json(request)
-            })    
-        }
+        } 
+
+        return RequestService.createRequest(req.app.get('db'), res.newRequest)
+          .then(() => {
+            sse.emit('newRequest')
+            return res.status(201).json({message: 'Success!'}).end()
+          })    
       })
       .catch(next)
   })
-  .patch()
-  .delete()
+  .patch((req,res,next) => {
+    const { status, id } = res.newRequest
+    RequestService.updateRequest(req.app.get('db'), status, id)
+      .then(() => {
+        sse.emit('newRequest')
+        return res.status(200).json({message: 'Success!'}).end()
+      })
+      .catch(next)
+  })
+
 
 module.exports = requestsSse

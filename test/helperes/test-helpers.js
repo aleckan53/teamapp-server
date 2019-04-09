@@ -7,9 +7,10 @@ function makeFixtures () {
   const projects = fixtures.makeProjectsArray()
   const notifications = fixtures.makeNotificationsArray(users)
   const user_projects = fixtures.makeUserProjectsArray(users, projects)
+  const requests = fixtures.makeRequestsArray()
 
   return {
-    users, projects, notifications, user_projects
+    users, projects, notifications, user_projects, requests
   }
 }
 
@@ -47,6 +48,10 @@ function seedUserProjects(db, user_projects) {
   return db.into('user_projects').insert(user_projects)
 }
 
+function seedRequests(db, requests) {
+  return db.into('requests').insert(requests)
+}
+
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   const token = jwt.sign({user_id: user.id}, secret, {
     subject: user.email,
@@ -62,5 +67,6 @@ module.exports = {
   seedUsers,
   seedProjects,
   seedUserProjects,
+  seedRequests,
   makeAuthHeader,
 }

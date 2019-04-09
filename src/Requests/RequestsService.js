@@ -11,26 +11,19 @@ const RequestsService = {
       .where({project_id})
       .select('*')
   },
-  updateRequest(knex, data, id) {
+  updateRequest(knex, status, id) {
     return knex('requests')
       .where({id})
-      .update({status: data.status}, ['*'])
+      .update({status}, ['*'])
       .then(request=> {
-        if(data.status === 'Accepted') {
+        if(status === 'Accepted') {
           return knex
             .into('user_projects')
             .insert({
-              user_id: data.user_id,
-              project_id: data.project_id,
+              user_id: request[0].sender_id,
+              project_id: request[0].project_id,
               role: 'contributor',
             })
-            .returning('*')
-            .then(newProject=> ({
-              request: request[0],
-              user_project: newProject[0],
-            }))
-        } else {
-          return request[0]
         }
       })
   },

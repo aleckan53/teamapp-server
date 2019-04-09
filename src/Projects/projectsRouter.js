@@ -8,7 +8,7 @@ projectsRouter
   .route('/')
   .all(requireAuth)
   .get((req,res)=>{
-    const limit = 15
+    const limit = 5
     const { term='', page } = req.query
     const offset = (page-1)*limit
     ProjectsService.getProjectsList(
@@ -17,7 +17,14 @@ projectsRouter
       limit,
       offset,
     )
-      .then(data=> res.json(data))
+      .then(data=> {
+        data.projects.map(project => {
+          if (project.leader_id === res.user.id) {
+            return project.userCanEdit = true
+          }
+        })
+        return res.status(200).json(data)
+      })
   })
 
 projectsRouter
@@ -28,7 +35,7 @@ projectsRouter
       req.app.get('db'),
       res.user.id
     )
-      .then(data=> res.json(data))
+      .then(data=> res.status(200).json(data))
       .catch(next)
   })
 
@@ -68,7 +75,10 @@ projectsRouter
       updatedProject,
       req.params.project_id
     )
-      .then((data)=> res.status(200).json(data[0]))
+      .then((data)=> {
+        sse.emit('newRequest')
+        return res.status(200).json(data[0])
+      })
       .catch(next)
   })
   .delete((req,res,next)=>{
@@ -76,7 +86,10 @@ projectsRouter
       req.app.get('db'),
       req.params.project_id
     )
-      .then(()=> res.status(204).end())
+      .then(()=> {
+        sse.emit('newRequest')
+        return res.status(204).end()
+      })
       .catch(next)
   })
 
@@ -90,8 +103,10 @@ projectsRouter
         if(!list) {
           return res.status(404).json({error: 'Something went wrong'})
         }
-
-        return res.status(200).json(list)
+        return res.status(200).json({
+          list,
+          userJoined: list.some(u => u.user_id === res.user.id)
+        })
 
       })
       .catch(next)
@@ -101,7 +116,8 @@ projectsRouter
 function checkProjectExists(req,res,next) {
   ProjectsService.getProjectById(
     req.app.get('db'),
-    req.params.project_id
+    req.params.project_id,
+    res.user.id
   )
    .then(project=> {
     if(!project) {
@@ -109,7 +125,10 @@ function checkProjectExists(req,res,next) {
         error: `Project with id ${req.params.project_id} doesn't exist`
       })
     }  
-    res.project = project
+    res.project = {
+      ...project,
+      userCanEdit: res.user.id === project.leader_id
+    }
     next()
     return null
    })
