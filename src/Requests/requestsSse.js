@@ -81,7 +81,7 @@ requestsSse
     RequestsService.deleteRequest(req.app.get('db'), req.params.request_id)
       .then(() => {
         sse.emit('newRequest')
-        return res.status(204).json({message: 'Success!'}).end()
+        return res.status(204).end()
       })
       .catch(next)
   })

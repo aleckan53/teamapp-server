@@ -2,7 +2,6 @@ BEGIN;
 
 TRUNCATE
   users,
-  notifications,
   projects,
   user_projects,
   requests
@@ -33,13 +32,15 @@ VALUES
     'https://i.guim.co.uk/img/static/sys-images/Guardian/Pix/pictures/2015/11/11/1447256093904/Natalie-Dormergoin-009.jpg?width=300&quality=85&auto=format&fit=max&s=dd10398f631067df9dbd7332ec82badf', 
     '$2a$12$ih..MMyEY28hHpBmMrWCk.w88QxiuTw07SPQ/T4I9Ek3BxEBvsxVG',
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+  ),
+  (
+    'Jon',
+    'Snow',
+    'jonsnow@ironthrone.com',
+    'https://akm-img-a-in.tosshub.com/indiatoday/images/story/201903/kit.jpeg?lpOiussrW2pB6TdhoGSjS_PBn7OQE6zD',
+    '$2a$12$IfBv1jfYiM2ZRrQEpteYdue8cwHsf2AuqcLmaC0ZXeX/EvGewEOL2',
+    'The King in the North'
   );
-
-INSERT INTO notifications (id, text, user_id) 
-VALUES
-  (1, 'New message from Putin', 2),
-  (2, 'New request from Donald', 1),
-  (3, 'Your request was accepted by Kim', 3);
 
 INSERT INTO projects (title, description, img, leader_id)
 VALUES
@@ -108,10 +109,18 @@ VALUES
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
     'https://rsp3k1pe7ulhpgnt-zippykid.netdna-ssl.com/wp-content/uploads/2017/03/vue.jpg',
     1
+  ),
+  (
+    'Defend the North',
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    'https://www.thesun.co.uk/wp-content/uploads/2019/04/NINTCHDBPICT0004824116672.jpg?strip=all&w=871&quality=100',
+    4
   );
 
 INSERT INTO user_projects (user_id, role, project_id, title)
 VALUES
+  (4, 'leader', 12, 'Team lead'),
+  (4, 'contributor', 1, 'Software engineer'),
   (1, 'leader', 1, 'Project lead'),
   (1, 'leader', 11, 'Project lead'),
   (1, 'contributor', 2, 'UI designer'),
@@ -129,6 +138,9 @@ VALUES
 
 INSERT INTO requests (sender_id, project_id, recipient_id)
   VALUES
+    (1, 12, 4),
+    (2, 12, 4),
+    (3, 12, 4),
     (1, 4, 3),
     (2, 11, 1),
     (2, 1, 1);

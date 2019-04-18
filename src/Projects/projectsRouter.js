@@ -8,7 +8,7 @@ projectsRouter
   .route('/')
   .all(requireAuth)
   .get((req,res)=>{
-    const limit = 5
+    const limit = 8
     const { term='', page } = req.query
     const offset = (page-1)*limit
     ProjectsService.getProjectsList(
@@ -50,6 +50,13 @@ projectsRouter
         return res.status(400).json({
           error: `Missing '${key}' in request body`
         })
+
+    // sets default project image if no link supplied
+    try {
+      new URL(img)
+    } catch {
+      newProject.img = 'https://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2014/4/11/1397210130748/Spring-Lamb.-Image-shot-2-011.jpg'
+    }
     
     ProjectsService.addProject(
       req.app.get('db'),
@@ -77,7 +84,7 @@ projectsRouter
     )
       .then((data)=> {
         sse.emit('newRequest')
-        return res.status(200).json(data[0])
+        return res.status(200).json({...data[0], userCanEdit: true})
       })
       .catch(next)
   })

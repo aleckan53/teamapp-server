@@ -2,7 +2,7 @@ const app = require('../src/app')
 const knex = require('knex')
 const helpers = require('./helperes/test-helpers')
 
-describe.only('Requests endpoints', () => {
+describe('Requests endpoints', () => {
   let db
 
   const {
@@ -72,8 +72,8 @@ describe.only('Requests endpoints', () => {
     })
   })
 
-  describe('DELETE /api/sse/requests', () => {
-    beforeEach('insert users and projects in the db', () => {
+  describe('DELETE /api/sse/requests/:id', () => {
+    beforeEach('insert data', () => {
       return helpers.seedUsers(db, users)
         .then(()=>helpers.seedProjects(db, projects)
         .then(()=>helpers.seedRequests(db, requests)))
@@ -81,9 +81,8 @@ describe.only('Requests endpoints', () => {
 
     it('repsonds with 204 and removes specified request', () => {
       return supertest(app)
-        .delete('/api/sse/requests')
+        .delete('/api/sse/requests/1')
         .set('Authorization', helpers.makeAuthHeader(users[0]))
-        .send({id: 1})
         .expect(204) // check db if request is gone
     })  
   })

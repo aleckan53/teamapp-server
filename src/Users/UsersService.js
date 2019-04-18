@@ -76,7 +76,8 @@ const UsersService = {
       first_name: xss(user.first_name),
       last_name: xss(user.last_name),
       avatar: xss(user.avatar),
-      password: xss(user.password)
+      password: xss(user.password),
+      about: xss(user.about),
     }
   },
   validateAvatar(str) {
@@ -86,7 +87,7 @@ const UsersService = {
     } catch {
       return false
     }
-  }
+  },
 }
 
 module.exports = UsersService

@@ -162,7 +162,8 @@ describe('Projects Endpoints', () => {
           .send(updatedProject)
           .expect(200, {
             ...updatedProject,
-            id: 1
+            id: 1,
+            userCanEdit: true,
           })
       })
     })

@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const knex = require('knex')
 const helpers = require('./helperes/test-helpers')
 
-describe('Auth Endpoints', ()=> {
+describe.only('Auth Endpoints', ()=> {
   let db
 
   const testUsers = helpers.makeFixtures().users
@@ -68,6 +68,7 @@ describe('Auth Endpoints', ()=> {
           process.env.JWT_SECRET,
           {
             subject: testUser.email,
+            expiresIn: process.env.JWT_EXPIRY,
             algorithm: 'HS256'
           }
         )

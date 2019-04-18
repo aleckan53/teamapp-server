@@ -1,25 +1,26 @@
 const express = require('express')
 const UsersService = require('./usersService')
-const { requireAuth } = require('../middleware/jwt-auth') 
 const multer = require('multer')
-const storage = multer.diskStorage({
-  destination: (req,file,cb) => {
-    cb(null, './uploads/')
-  },
-  filename: (req,file,cb)=> {
-    cb(null, file.originalname)
-  }
-})
-const upload = multer({storage})
+const { requireAuth } = require('../middleware/jwt-auth') 
 
 const usersRouter = express.Router()
 const jsonParser = express.json()
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/img/avatar/')
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  },
+})
+
+const upload = multer({storage: storage, limits: 5e+6})
+
 usersRouter
   .route('/create')
-  .post(jsonParser, (req,res,next)=> {
+  .post(upload.single('avatar'), (req,res,next)=> {
     const userRequest = UsersService.serializeUser(req.body) // serialize data
-
     for(const field of ['email', 'first_name', 'last_name', 'password']){  // checks missing fields
       if(!userRequest[field]) {
         return res.status(400).json({error: `Missing ${field} in request body`})
@@ -38,11 +39,18 @@ usersRouter
         }
         const { password } = userRequest
 
+        // sets default avatar if no link supplied
+        try {
+          new URL(userRequest.avatar)
+        } catch {
+          userRequest.avatar = 'https://ichef.bbci.co.uk/news/660/cpsprodpb/169F6/production/_91026629_gettyimages-519508400.jpg'
+        }
+
         UsersService.hashPassword(password)  // hashes the password
           .then(hashedPassword => {
             const userRdy = {
               ...userRequest,
-              password: hashedPassword
+              password: hashedPassword,
             }
             UsersService.createUser( // inserts in db
               req.app.get('db'),
@@ -52,12 +60,6 @@ usersRouter
           })
       })
       .catch(next)
-  })
-
-usersRouter 
-  .route('/upload')
-  .post(upload.single('image'), (req,res,next)=> {
-    console.log(req.file)
   })
 
 usersRouter
