@@ -128,7 +128,7 @@ describe('Projects Endpoints', () => {
         .expect(res=> {
           expect(res.body.id).to.be.a('number')
           expect(res.body.title).to.eql(newProject.title)
-          expect(res.body.img).to.eql(newProject.img)
+          expect(res.body.img).to.not.eql(newProject.img)
           expect(res.body.description).to.eql(newProject.description)
         })
     })

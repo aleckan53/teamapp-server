@@ -9,25 +9,29 @@ const sse = express()
 
 global.sse = sse
 
-const authRouter = require('./auth/authRouter')
-const usersRouter = require('./users/usersRouter')
-const projectsRouter = require('./projects/projectsRouter')
-const requestsSse = require('./Requests/requestsSse')
+const authRouter = require('./auth/auth-router')
+const usersRouter = require('./users/users-router')
+const projectsRouter = require('./projects/projects-router')
+const requestsRouter = require('./requests/requests-router')
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
   : 'common';
 
 app.use(morgan(morganOption))
-app.use(cors())
+app.use(cors({
+  "origin": "*",
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+  "preflightContinue": false,
+  "optionsSuccessStatus": 200
+}))
 app.use(helmet())
 
-// TODO # : Photo uploads
-// app.use('/uploads/img/avatar', express.static('uploads/img/avatar'))
+// TODO: Photo uploads
 app.use('/api/users', usersRouter)
 app.use('/api/projects', projectsRouter)
 app.use('/api/auth', authRouter)
-app.use('/api/sse', requestsSse)
+app.use('/api/sse', requestsRouter)
 
 
 /* handles internal errors */

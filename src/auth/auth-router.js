@@ -1,7 +1,7 @@
 const express = require('express')
 const jsonParser = express.json()
 const authRouter = express.Router()
-const AuthService = require('./authService')
+const AuthService = require('./auth-service')
 const { requireAuth } = require('../middleware/jwt-auth')
 
 authRouter
@@ -17,7 +17,7 @@ authRouter
   
     AuthService.getUserByEmail(
       req.app.get('db'),
-      email
+      email.toLowerCase()
     )
       .then(dbUser=> {
         if(!dbUser) {

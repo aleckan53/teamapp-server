@@ -1,4 +1,4 @@
-const AuthService = require('../Auth/authService')
+const AuthService = require('../auth/auth-service')
 const { PORT } = require('../config')
 
 function requireAuth(req, res, next) {

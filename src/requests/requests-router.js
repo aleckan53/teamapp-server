@@ -1,10 +1,10 @@
 const express = require('express');
-const requestsSse = express.Router()
+const requestsRouter = express.Router()
 const { requireAuth } = require('../middleware/jwt-auth')
-const RequestsService = require('./RequestsService')
+const RequestsService = require('./requests-service')
 const jsonParser = express.json()
 
-requestsSse
+requestsRouter
   .route('/')
   .all(requireAuth)
   .get((req,res,next) => {
@@ -13,7 +13,8 @@ requestsSse
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',  
     })
-    res.setTimeout(0)
+
+    res.setTimeout(2147483647) // max 32 bit int value
 
     RequestsService.getUsersRequests(req.app.get('db'), res.user.id)
       .then(requests => {
@@ -32,7 +33,7 @@ requestsSse
     })
   })
 
-requestsSse 
+requestsRouter 
   .route('/requests')
   .all(requireAuth)
   .all(jsonParser, (req,res,next) => {
@@ -74,7 +75,7 @@ requestsSse
       .catch(next)
   })
 
-requestsSse
+requestsRouter
   .route('/requests/:request_id')
   .all(requireAuth)
   .delete((req,res,next) => {
@@ -87,4 +88,4 @@ requestsSse
   })
 
 
-module.exports = requestsSse
+module.exports = requestsRouter

@@ -1,5 +1,5 @@
 const express = require('express')
-const UsersService = require('./usersService')
+const UsersService = require('./users-service')
 const multer = require('multer')
 const { requireAuth } = require('../middleware/jwt-auth') 
 
@@ -28,14 +28,14 @@ usersRouter
     }
 
     const passwordError = UsersService.validatePassword(userRequest.password) // validates pasword 
-
+    const email = userRequest.email.toLowerCase()
     if(passwordError)
       return res.status(400).json(passwordError)
 
-    UsersService.validateEmail(req.app.get('db'), userRequest.email)  // vlaidates email
+    UsersService.validateEmail(req.app.get('db'), email)  // vlaidates email
       .then(emailMatch => {
         if(emailMatch) {
-          return res.status(400).json({error: `Email ${userRequest.email} is already taken`})
+          return res.status(400).json({error: `Email ${email} is already taken`})
         }
         const { password } = userRequest
 

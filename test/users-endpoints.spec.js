@@ -2,7 +2,7 @@ const app = require('../src/app')
 const knex = require('knex')
 const helpers = require('./helperes/test-helpers')
 
-describe('Users Endpoints', () => {
+describe.skip('Users Endpoints', () => {
   let db
 
   const {
